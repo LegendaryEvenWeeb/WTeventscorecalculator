@@ -9,9 +9,11 @@ else:
     os.chdir(current_dir)
 
 def font_size(size:int):
+    print("font size def")
     return tkFont.Font(size=size)
 
 def open_score_based_window():
+    print("open score based window")
     clear_main_window()
     label.config(text="Score Based Window Content")
     
@@ -28,6 +30,7 @@ def open_score_based_window():
 
 
     def validate():
+        print("validation")
         scoreinput2 = int(scoreinput.get())
         submodeinput2 = submodeinput.get().upper()
         rankinput2 = int(rankinput.get())
@@ -54,6 +57,7 @@ def open_score_based_window():
     confirmbutton = tk.Button(text="Calculate", command=validate)
     confirmbutton.pack()
     def resetfields():
+        print("reset fields")
         modeinput.delete(0, tk.END)
         submodeinput.delete(0, tk.END)
         rankinput.delete(0, tk.END)
@@ -75,15 +79,28 @@ def open_score_based_window():
     back_button.pack(side=tk.BOTTOM)
 
 def clear_main_window():
+    print("clear main window")
     for widget in root.winfo_children():
         widget.pack_forget()
 
+main_window_open = False
+
+def open_main_window():
+    global main_window_open
+    root = tk.Tk()
+    # ... (rest of your main window setup)
+    main_window_open = True
+    root.mainloop()
+    main_window_open = False
+
 def reset_main_window():
-    clear_main_window()
-    label.config(text="Select the event type")
-    label.pack() 
-    button.pack()
-    button2.pack()
+    global main_window_open
+    if main_window_open:
+        clear_main_window()
+        label.config(text="Select the event type")
+        label.pack()
+        button.pack()
+        button2.pack()
 
 root = tk.Tk()
 root.title("Event score Calculator")
@@ -99,6 +116,7 @@ button.pack(padx=10)
 button2.pack(padx=10)
 
 def scorebased(modeinput:str, submodeinput:str, rankinput:int, scoreinput:int):
+    print("score based calculator")
     with open("modifiers.json", "r") as file:
         modifiers = json.load(file)
 
@@ -121,6 +139,7 @@ def scorebased(modeinput:str, submodeinput:str, rankinput:int, scoreinput:int):
     return output
 
 def craftingevent():
+    print("Open crafting event window")
     print("Coming soon:tm:")
 
 root.mainloop()
