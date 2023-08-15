@@ -1,11 +1,15 @@
 import json, os, sys
 import tkinter as tk
+import tkinter.font as tkFont
 
 if os.path.splitext(sys.argv[0])[1].lower() != ".exe":
     print("not an .exe")
 else:
     current_dir = os.path.dirname(os.path.abspath(sys.executable))
     os.chdir(current_dir)
+
+def font_size(size:int):
+    return tkFont.Font(size=size)
 
 def open_score_based_window():
     clear_main_window()
@@ -20,7 +24,8 @@ def open_score_based_window():
     scoreneededinputtext = tk.Label(text="How much score is required?")
     scoreinput = tk.Entry(root)
 
-    result_label = tk.Label(root, text="", fg="green")
+    result_label = tk.Label(root, text="", fg="green", font=font_size(16))
+
 
     def validate():
         scoreinput2 = int(scoreinput.get())
@@ -42,9 +47,9 @@ def open_score_based_window():
 
         try:
             calculated_result = scorebased(modeinput2, submodeinput2, rankinput2, scoreinput2)
-            result_label.config(text=f"Calculated Result: {calculated_result}", fg="green")
+            result_label.config(text=f"Calculated Result: {calculated_result}", fg="green", font=font_size(16))
         except Exception as e:
-            result_label.config(text=str(e), fg="red")
+            result_label.config(text=str(e), fg="red", font=font_size(14))
 
     confirmbutton = tk.Button(text="Calculate", command=validate)
     confirmbutton.pack()
@@ -53,6 +58,7 @@ def open_score_based_window():
         submodeinput.delete(0, tk.END)
         rankinput.delete(0, tk.END)
         scoreinput.delete(0, tk.END)
+        result_label.config(text="")
 
     resetfield = tk.Button(text="Reset", command=resetfields)
     modeinputtext.pack()
@@ -65,7 +71,7 @@ def open_score_based_window():
     scoreinput.pack()
     result_label.pack()
     resetfield.pack()
-    back_button = tk.Button(root, text="Back to Main", command=reset_main_window, padx=20, pady=20)
+    back_button = tk.Button(root, text="Back to Main", command=reset_main_window, width=20, height=5, font=font_size(14))
     back_button.pack(side=tk.BOTTOM)
 
 def clear_main_window():
