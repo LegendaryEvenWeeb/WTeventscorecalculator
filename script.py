@@ -1,12 +1,13 @@
-import json, os, sys
+import json, os, sys, re
 import tkinter as tk
 import tkinter.font as tkFont
 
 if os.path.splitext(sys.argv[0])[1].lower() != ".exe":
     print("not an .exe")
+    current_dir = os.path.dirname(os.path.abspath(__file__))
 else:
     current_dir = os.path.dirname(os.path.abspath(sys.executable))
-    os.chdir(current_dir)
+os.chdir(current_dir)
 
 def font_size(size:int):
     print("font size def")
@@ -35,10 +36,20 @@ def open_score_based_window():
 
     def validate():
         print("validation")
-        scoreinput_value = scoreinput.get()
         submodeinput2 = submode_var.get().upper()
         rankinput2 = int(rankinput.get())
         modeinput2 = mode_var.get().lower()
+        with open("modifiers.json", "r") as file:
+            modifiers = json.load(file)
+            modifiers = modifiers["scorebased"]
+        if modeinput2 == "naval":
+            modetouse = "naval"
+        else:
+            modetouse = "normal"
+        scoreinputreplace = scoreinput.get().replace("+m", f'*{float(modifiers["rank"][modetouse][f"{rankinput2}"])}*{float(modifiers["mode"][f"{modeinput2}"][f"{submodeinput2}"])}')
+        scoreinputreplace = re.sub(r'[^0-9]', '', scoreinputreplace)
+        print(scoreinputreplace)
+        scoreinput_value = eval(scoreinputreplace)
         if mode_var.get() == "hidden":
             result_label.config(text="Select a mode", fg="red")
             return
@@ -61,7 +72,7 @@ def open_score_based_window():
             return
         elif scoreinput2 <= 0:
             result_label.config(text="Done.", fg="green")
-        if (rankinput2 <= 0 or rankinput2 >= 6) and modeinput2 == "naval":
+        if ((rankinput2 < 1 or rankinput2 > 5) and modeinput2 == "naval") or (rankinput2 > 7 or rankinput2 < 1):
             result_label.config(text="No Such rank.", fg="red")
             return
         if submodeinput2 not in ["AB", "RB", "SB"] or (submodeinput2 == "SB" and modeinput2 == "naval"):
@@ -69,7 +80,10 @@ def open_score_based_window():
             return
         try:
             calculated_result = scorebased(modeinput2, submodeinput2, rankinput2, scoreinput2)
-            result_label.config(text=f"Calculated Result: {calculated_result}", fg="green", font=font_size(20))
+            if calculated_result <= 0:
+                result_label.config(text="Done", fg="green", font=font_size(20))
+            else:
+                result_label.config(text=f"Calculated Result: {calculated_result}", fg="green", font=font_size(20))
         except Exception as e:
             result_label.config(text=str(e), fg="red", font=font_size(20))
 
@@ -129,6 +143,7 @@ def scorebased(modeinput:str, submodeinput:str, rankinput:int, scoreinput:int):
     print("score based calculator")
     with open("modifiers.json", "r") as file:
         modifiers = json.load(file)
+        modifiers = modifiers["scorebased"]
 
     modes = modifiers["mode"]
     ranks = modifiers["rank"]
