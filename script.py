@@ -28,8 +28,8 @@ def open_score_based_window():
     tk.Radiobutton(root, text="AB", variable=submode_var, value="AB").grid(row=6, column=0)
     tk.Radiobutton(root, text="RB", variable=submode_var, value="RB").grid(row=7, column=0)
     tk.Radiobutton(root, text="SB", variable=submode_var, value="SB").grid(row=8, column=0)
-    tk.Label(root, text="Please select what rank you want to play in\n(1-7)").grid(row=1,column=3)
-    rankinput = tk.Spinbox(root, from_=1, to=7)
+    tk.Label(root, text="Please select what rank you want to play in\n(1-8)").grid(row=1,column=3)
+    rankinput = tk.Spinbox(root, from_=1, to=8)
     tk.Label(root, text="How much score is required?").grid(row=3,column=3)
     scoreinput = tk.Entry(root)
     result_label = tk.Label(root, text="", fg="green", font=font_size(20))
@@ -47,7 +47,7 @@ def open_score_based_window():
         else:
             modetouse = "normal"
         scoreinputreplace = scoreinput.get().replace("+m", f'*{float(modifiers["rank"][modetouse][f"{rankinput2}"])}*{float(modifiers["mode"][f"{modeinput2}"][f"{submodeinput2}"])}')
-        scoreinputreplace = re.sub(r'[^0-9]', '', scoreinputreplace)
+        scoreinputreplace = re.sub(r'[^0-9+-]', '', scoreinputreplace)
         print(scoreinputreplace)
         scoreinput_value = eval(scoreinputreplace)
         if mode_var.get() == "hidden":
@@ -72,7 +72,7 @@ def open_score_based_window():
             return
         elif scoreinput2 <= 0:
             result_label.config(text="Done.", fg="green")
-        if ((rankinput2 < 1 or rankinput2 > 5) and modeinput2 == "naval") or (rankinput2 > 7 or rankinput2 < 1):
+        if ((rankinput2 < 1 or rankinput2 > 5) and modeinput2 == "naval") or (rankinput2 > 8 or rankinput2 < 1):
             result_label.config(text="No Such rank.", fg="red")
             return
         if submodeinput2 not in ["AB", "RB", "SB"] or (submodeinput2 == "SB" and modeinput2 == "naval"):
