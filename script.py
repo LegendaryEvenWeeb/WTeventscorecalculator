@@ -47,7 +47,7 @@ def open_score_based_window():
         else:
             modetouse = "normal"
         scoreinputreplace = scoreinput.get().replace("+m", f'*{float(modifiers["rank"][modetouse][f"{rankinput2}"])}*{float(modifiers["mode"][f"{modeinput2}"][f"{submodeinput2}"])}')
-        scoreinputreplace = re.sub(r'[^0-9+-]', '', scoreinputreplace)
+        scoreinputreplace = re.sub(r'[^0-9+().*\-m]', '', scoreinputreplace)
         print(scoreinputreplace)
         scoreinput_value = eval(scoreinputreplace)
         if mode_var.get() == "hidden":
