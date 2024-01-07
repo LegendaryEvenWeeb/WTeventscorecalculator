@@ -1,6 +1,7 @@
 import json, os, sys, re
 import tkinter as tk
 import tkinter.font as tkFont
+from tktooltip import ToolTip
 
 if os.path.splitext(sys.argv[0])[1].lower() != ".exe":
     print("not an .exe")
@@ -9,30 +10,112 @@ else:
     current_dir = os.path.dirname(os.path.abspath(sys.executable))
 os.chdir(current_dir)
 
+score_list = []
+time_list = []
+
 def font_size(size:int):
-    print("font size def")
     return tkFont.Font(size=size)
 
 def open_score_based_window():
-    print("open score based window")
-    clear_main_window()
-    label.config(text="Score Based Window Content")
-
+    tk.Label(root, text="Select your rank you will play").grid(row=1,column=3)
+    rankinput = tk.Spinbox(root, from_=1, to=8)
+    ToolTip(rankinput, msg="Only goes in a range from 1 to 8")
+    tk.Label(root, text="How much score is required?").grid(row=3,column=3)
+    scoreinput = tk.Entry(root)
+    with open("modifiers.json", "r") as file:
+        modifiers = json.load(file)
+        modifiers = modifiers["scorebased"]
     mode_var = tk.StringVar(value="hidden")
     submode_var = tk.StringVar(value="hidden")  
-    tk.Label(root, text="Select the gamemode:").grid(row=1,column=0)
+    tk.Label(root, text="Select the gamemode").grid(row=1,column=0)
     tk.Radiobutton(root, text="Ground", variable=mode_var, value="ground").grid(row=2, column=0)
     tk.Radiobutton(root, text="Air", variable=mode_var, value="air").grid(row=3, column=0)
     tk.Radiobutton(root, text="Naval", variable=mode_var, value="naval").grid(row=4, column=0)
-    tk.Label(root, text="Select the sub-mode:").grid(row=5,column=0)
+    tk.Label(root, text="Select the sub-mode").grid(row=5,column=0)
     tk.Radiobutton(root, text="AB", variable=submode_var, value="AB").grid(row=6, column=0)
     tk.Radiobutton(root, text="RB", variable=submode_var, value="RB").grid(row=7, column=0)
     tk.Radiobutton(root, text="SB", variable=submode_var, value="SB").grid(row=8, column=0)
-    tk.Label(root, text="Please select what rank you want to play in\n(1-8)").grid(row=1,column=3)
-    rankinput = tk.Spinbox(root, from_=1, to=8)
-    tk.Label(root, text="How much score is required?").grid(row=3,column=3)
-    scoreinput = tk.Entry(root)
+    ToolTip(scoreinput, msg="typing '+m' will add the modifiers\nonto the number you wrote the +m after\nSupports arithmetic with *,+,() and -")
     result_label = tk.Label(root, text="", fg="green", font=font_size(20))
+    average_result_label = tk.Label(root, text="", fg="green", font=font_size(20))
+
+    tk.Label(root, text="Inputted Modifiers").grid(row=12, column=3)
+    tk.Label(root, text="Air and Ground").grid(row=13, column=3)
+    tk.Label(root, text="Naval").grid(row=13, column=4)
+    tk.Label(root, text="Ranks").grid(row=13, column=2)
+    tk.Label(root, text="1").grid(row=14, column=2)
+    tk.Label(root, text=f"{modifiers['rank']['normal']['1']}").grid(row=14, column=3)
+    tk.Label(root, text=f"{modifiers['rank']['naval']['1']}").grid(row=14, column=4)
+    tk.Label(root, text="2").grid(row=15, column=2)
+    tk.Label(root, text=f"{modifiers['rank']['normal']['2']}").grid(row=15, column=3)
+    tk.Label(root, text=f"{modifiers['rank']['naval']['2']}").grid(row=15, column=4)
+    tk.Label(root, text="3").grid(row=16, column=2)
+    tk.Label(root, text=f"{modifiers['rank']['normal']['3']}").grid(row=16, column=3)
+    tk.Label(root, text=f"{modifiers['rank']['naval']['3']}").grid(row=16, column=4)
+    tk.Label(root, text="4").grid(row=17, column=2)
+    tk.Label(root, text=f"{modifiers['rank']['normal']['4']}").grid(row=17, column=3)
+    tk.Label(root, text=f"{modifiers['rank']['naval']['4']}").grid(row=17, column=4)
+    tk.Label(root, text="5").grid(row=18, column=2)
+    tk.Label(root, text=f"{modifiers['rank']['normal']['5']}").grid(row=18, column=3)
+    tk.Label(root, text=f"{modifiers['rank']['naval']['5']}").grid(row=18, column=4)
+    tk.Label(root, text="6").grid(row=19, column=2)
+    tk.Label(root, text=f"{modifiers['rank']['normal']['6']}").grid(row=19, column=3)
+    tk.Label(root, text="-").grid(row=19, column=4)
+    tk.Label(root, text="7").grid(row=20, column=2)
+    tk.Label(root, text=f"{modifiers['rank']['normal']['7']}").grid(row=20, column=3)
+    tk.Label(root, text="-").grid(row=20, column=4)
+    tk.Label(root, text="8").grid(row=21, column=2)
+    tk.Label(root, text=f"{modifiers['rank']['normal']['8']}").grid(row=21, column=3)
+    tk.Label(root, text="-").grid(row=21, column=4)
+
+    tk.Label(root, text="Calculate the average", font=font_size(16)).grid(row=10, column=10)
+    tk.Label(root, text="Enter your time").grid(row=11, column=10)
+    timegiven = tk.Entry(root)
+    timegiven.grid(row=12,column=10)
+    ToolTip(timegiven, msg="'h' converts hours to minutes(1h30 will return 90 minutes)")
+    tk.Label(root, text="Enter your score").grid(row=13, column=10)
+    scoregiven = tk.Spinbox(root, from_=0, to=40000)
+    scoregiven.grid(row=14,column=10)
+    ToolTip(scoregiven, msg="Without the additional modifiers")
+
+    def validate_avg():
+        scoregiven2 = scoregiven.get()
+        timegiven2 = timegiven.get()
+        print("validation (avg)")
+        scoregiven2 = re.sub(r'[^0-9]', '', scoregiven2)
+        timegiven2 = re.sub(r'[^0-9h]', '', timegiven2)
+        timegiven2 = timegiven2.replace('h', "*60+")
+        if timegiven2.split('+')[-1]=='':
+            timegiven2+="0"
+        timegiven2 = eval(timegiven2)
+        global time_list
+        global score_list
+        score_list.append(int(scoregiven2))
+        time_list.append(int())
+        print(score_list)
+        print(time_list)
+    def reset_avg():
+        print("reset (avg)")
+        global score_list
+        score_list = []
+        print(score_list)
+    def calc_game_avg(time_avg, score_avg, current_score):
+        
+        average_result_label.config(text=f"Calculated Result:", fg="green", font=font_size(20))
+    def calc_score_avg():
+        global score_list
+        temp_num = 0
+        for i in score_list:
+            temp_num+=i
+        temp_div = len(score_list)
+        return temp_num/temp_div
+    def calc_time_avg():
+        global time_list
+        temp_num = 0
+        for i in time_list:
+            temp_num+=i
+        temp_div = len(time_list)
+        return temp_num/temp_div
 
     def validate():
         print("validation")
@@ -86,6 +169,12 @@ def open_score_based_window():
                 result_label.config(text=f"Calculated Result: {calculated_result}", fg="green", font=font_size(20))
         except Exception as e:
             result_label.config(text=str(e), fg="red", font=font_size(20))
+        average_score = calc_score_avg()
+        average_time = calc_time_avg()
+        try:
+            calc_game_avg(average_time, average_score, scoreinput_value)
+        except Exception as e:
+            average_result_label.config(text=str(e), fg="red", font=font_size(20))
 
     def resetfields():
         print("reset fields")
@@ -99,45 +188,17 @@ def open_score_based_window():
 
     confirmbutton = tk.Button(root, text="Calculate", command=validate)
     resetfield = tk.Button(root, text="Reset", command=resetfields)
-    confirmbutton.grid(row=5, column=3, columnspan=2, pady=10)
-    resetfield.grid(row=6, column=3)
-    scoreinput.grid(row=4,column=3)
-    rankinput.grid(row=2, column=3)
+    confirmbutton.grid(row=5, column=3, columnspan=1, sticky="ew")
+    resetfield.grid(row=6, column=3, sticky="ew")
+    scoreinput.grid(row=4,column=3, sticky="ew")
+    rankinput.grid(row=2, column=3, sticky="ew")
     result_label.grid(row=10,column=0,columnspan=10)
-
-def clear_main_window():
-    print("clear main window")
-    for widget in root.winfo_children():
-        widget.pack_forget()
-
-main_window_open = False
-def open_main_window():
-    global main_window_open
-    root = tk.Tk()
-    main_window_open = True
-    root.mainloop()
-    main_window_open = False
-def reset_main_window():
-    global main_window_open
-    if main_window_open:
-        clear_main_window()
-        label.config(text="Select the event type")
-        label.pack()
-        button.pack()
-        button2.pack()
-
+    result_label.grid(row=12,column=0,columnspan=10)
+    tk.Button(root, text="Add", command=validate_avg).grid(row=15,column=10)
+    tk.Button(root, text="Reset", command=reset_avg).grid(row=16,column=10)
 root = tk.Tk()
 root.title("Event score Calculator")
-root.geometry("800x600")
-
-label = tk.Label(root, text="Select the event type")
-label.pack()
-
-button = tk.Button(root, text="Score based", command=open_score_based_window, width=50, height=20)
-button2 = tk.Button(root, text="Crafting (Crates)\n[DOES NOT WORK FOR NOW]", width=50, height=20)
-
-button.pack(padx=10)
-button2.pack(padx=10)
+root.geometry("1024x720")
 
 def scorebased(modeinput:str, submodeinput:str, rankinput:int, scoreinput:int):
     print("score based calculator")
@@ -163,8 +224,5 @@ def scorebased(modeinput:str, submodeinput:str, rankinput:int, scoreinput:int):
     output = round(maths1)
     return output
 
-def craftingevent():
-    print("Open crafting event window")
-    print("Coming soon:tm:")
-
+open_score_based_window()
 root.mainloop()
