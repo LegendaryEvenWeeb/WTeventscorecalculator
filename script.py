@@ -91,16 +91,19 @@ def open_score_based_window():
         global time_list
         global score_list
         score_list.append(int(scoregiven2))
-        time_list.append(int())
+        time_list.append(int(timegiven2))
         print(score_list)
         print(time_list)
     def reset_avg():
         print("reset (avg)")
         global score_list
         score_list = []
+        time_list = []
         print(score_list)
-    def calc_game_avg(time_avg, score_avg, current_score):
-        
+        print(time_list)
+    def calc_game_avg(time_avg, score_avg):
+        average_ppm = score_avg/time_avg
+        average_games = print("WIP")
         average_result_label.config(text=f"Calculated Result:", fg="green", font=font_size(20))
     def calc_score_avg():
         global score_list
@@ -172,7 +175,7 @@ def open_score_based_window():
         average_score = calc_score_avg()
         average_time = calc_time_avg()
         try:
-            calc_game_avg(average_time, average_score, scoreinput_value)
+            calc_game_avg(average_time, average_score)
         except Exception as e:
             average_result_label.config(text=str(e), fg="red", font=font_size(20))
 
@@ -192,8 +195,8 @@ def open_score_based_window():
     resetfield.grid(row=6, column=3, sticky="ew")
     scoreinput.grid(row=4,column=3, sticky="ew")
     rankinput.grid(row=2, column=3, sticky="ew")
-    result_label.grid(row=10,column=0,columnspan=10)
-    result_label.grid(row=12,column=0,columnspan=10)
+    result_label.grid(row=9,column=0,columnspan=10)
+    average_result_label.grid(row=10,column=0,columnspan=10)
     tk.Button(root, text="Add", command=validate_avg).grid(row=15,column=10)
     tk.Button(root, text="Reset", command=reset_avg).grid(row=16,column=10)
 root = tk.Tk()
