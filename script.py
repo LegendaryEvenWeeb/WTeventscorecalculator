@@ -101,10 +101,14 @@ def open_score_based_window():
         time_list = []
         print(score_list)
         print(time_list)
-    def calc_game_avg(time_avg, score_avg):
-        average_ppm = score_avg/time_avg
-        average_games = print("WIP")
-        average_result_label.config(text=f"Calculated Result:", fg="green", font=font_size(20))
+    def calc_game_avg(time_avg, score_avg, scoreneeded):
+        try:
+            average_ppm = score_avg/time_avg
+            average_ppm = round(average_ppm, 2)
+            average_games = scoreneeded / score_avg
+        except ZeroDivisionError:
+            average_ppm = "Zero Division Error"
+        average_result_label.config(text=f"Calculated Average Points/min: {average_ppm}\nCalculated average games needed: {average_games}", fg="green", font=font_size(20))
     def calc_score_avg():
         global score_list
         temp_num = 0
@@ -175,7 +179,7 @@ def open_score_based_window():
         average_score = calc_score_avg()
         average_time = calc_time_avg()
         try:
-            calc_game_avg(average_time, average_score)
+            calc_game_avg(average_time, average_score, scoreinput_value)
         except Exception as e:
             average_result_label.config(text=str(e), fg="red", font=font_size(20))
 
