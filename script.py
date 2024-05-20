@@ -10,8 +10,11 @@ else:
     current_dir = os.path.dirname(os.path.abspath(sys.executable))
 os.chdir(current_dir)
 
-score_list = []
-time_list = []
+#score_list = []
+#time_list = []
+#debug inputs
+score_list=[2500,150,3600]
+time_list=[15,2,25]
 
 def font_size(size:int):
     return tkFont.Font(size=size)
@@ -103,6 +106,10 @@ def open_score_based_window():
         print(time_list)
     def calc_game_avg(time_avg, score_avg, scoreneeded):
         try:
+            print(type(time_avg))
+            if (type(time_avg)=="NoneType") or (type(score_avg)=="NoneType"):
+                print("Nothing inputted for the averages")
+                raise ZeroDivisionError
             average_ppm = score_avg/time_avg
             average_ppm = round(average_ppm, 2)
             average_games = scoreneeded / score_avg
@@ -115,14 +122,20 @@ def open_score_based_window():
         for i in score_list:
             temp_num+=i
         temp_div = len(score_list)
-        return temp_num/temp_div
+        try:
+            return temp_num/temp_div
+        except ZeroDivisionError:
+            print("Zero Division Error")
     def calc_time_avg():
         global time_list
         temp_num = 0
         for i in time_list:
             temp_num+=i
         temp_div = len(time_list)
-        return temp_num/temp_div
+        try:
+            return temp_num/temp_div
+        except ZeroDivisionError:
+            print("Zero Division Error")
 
     def validate():
         print("validation")
